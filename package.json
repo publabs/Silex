@@ -113,7 +113,7 @@
     "eslint": "^5.16.0",
     "less": "3.9.0",
     "monaco-editor": "^0.17.0",
-    "monaco-editor-webpack-plugin": "^1.7.0",
+    "monaco-editor-webpack-plugin": "~1.7.0",
     "nodemon": "^1.19.0",
     "npm-watch": "^0.6.0",
     "pug-cli": "^1.0.0-alpha6",

@@ -11,3 +11,4 @@ dist/client
 dist/server
 dist/prodotype
 dist/html
+.idea/
