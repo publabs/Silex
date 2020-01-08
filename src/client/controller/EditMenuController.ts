@@ -15,15 +15,15 @@
  *
  */
 
-import { Constants } from '../../Constants';
-import { ComponentData, PseudoClass, StyleName, Visibility } from '../model/Data';
-import { DomDirection, SilexElement } from '../model/Element';
-import { ClipboardItem, FileInfo, LinkData, Model, View } from '../types';
-import { InvalidationManager } from '../utils/InvalidationManager';
-import { SilexNotification } from '../utils/Notification';
-import { Style } from '../utils/Style';
-import { FileExplorer } from '../view/dialog/FileExplorer';
-import { ControllerBase } from './ControllerBase';
+import {Constants} from '../../Constants';
+import {ComponentData, PseudoClass, StyleName, Visibility} from '../model/Data';
+import {DomDirection, SilexElement} from '../model/Element';
+import {ClipboardItem, FileInfo, LinkData, Model, View} from '../types';
+import {InvalidationManager} from '../utils/InvalidationManager';
+import {SilexNotification} from '../utils/Notification';
+import {Style} from '../utils/Style';
+import {FileExplorer} from '../view/dialog/FileExplorer';
+import {ControllerBase} from './ControllerBase';
 
 /**
  * @param view  view class which holds the other views
@@ -47,7 +47,7 @@ export class EditMenuController extends ControllerBase {
       this.model.body.emptySelection();
       this.undoredoInvalidationManager.callWhenReady(() => {
         if (ControllerBase.getStatePending === 0 &&
-            ControllerBase.undoHistory.length > 0) {
+          ControllerBase.undoHistory.length > 0) {
           const state = this.getState();
           ControllerBase.redoHistory.push(state);
           const prevState = ControllerBase.undoHistory.pop();
@@ -95,23 +95,23 @@ export class EditMenuController extends ControllerBase {
 
     // select the sections instead of their container content
     const clonesData =
-        // clone the elements
-        elements
-            .map((element) => this.model.element.noSectionContent(element))
-            .filter((element) => {
-              // not the body
-              return body !== element;
-                  // // not an element which has a selected parent
-                  // // FIXME: closest is not yet defined on Element in google
-                  // // closure, remove the array access ['closest'] when it is
-                  // && element.parentElement['closest']('.' + Constants.SELECTED_CLASS_NAME) == null;
-            })
-            .map((element) => {
-              return {
-                el: element.cloneNode(true) as HTMLElement,
-                parent: element.parentElement,
-              };
-            });
+      // clone the elements
+      elements
+        .map((element) => this.model.element.noSectionContent(element))
+        .filter((element) => {
+          // not the body
+          return body !== element;
+          // // not an element which has a selected parent
+          // // FIXME: closest is not yet defined on Element in google
+          // // closure, remove the array access ['closest'] when it is
+          // && element.parentElement['closest']('.' + Constants.SELECTED_CLASS_NAME) == null;
+        })
+        .map((element) => {
+          return {
+            el: element.cloneNode(true) as HTMLElement,
+            parent: element.parentElement,
+          };
+        });
     if (clonesData.length > 0) {
       // reset clipboard
       const clipboard: ClipboardItem[] = [];
@@ -148,7 +148,7 @@ export class EditMenuController extends ControllerBase {
       const len = res.element.childNodes.length;
       for (let idx = 0; idx < len; idx++) {
         const el = (res.element.childNodes[idx] as HTMLElement);
-        if (el.nodeType === 1 && this.model.element.getType(el) != null ) {
+        if (el.nodeType === 1 && this.model.element.getType(el) != null) {
           res.children.push(this.recursiveCopy(el, el.parentElement));
         }
       }
@@ -260,7 +260,8 @@ export class EditMenuController extends ControllerBase {
     if (!!elements.find((el) => el === this.model.body.getBodyElement())) {
       SilexNotification.alert('Delete elements',
         'Error: I can not delete the body as it is the root container of all your website. <strong>Please select an element to delete it</strong>.',
-        () => {},
+        () => {
+        },
       );
     } else {
       // confirm and delete
@@ -314,17 +315,17 @@ export class EditMenuController extends ControllerBase {
           break;
         case Constants.TYPE_IMAGE:
           this.view.fileExplorer.openFile(FileExplorer.IMAGE_EXTENSIONS)
-              .then((blob) => {
-                if (blob) {
-                  // load the image
-                  this.model.element.setImageUrl(element, blob.url);
-                }
-              })
-              .catch((error) => {
-                SilexNotification.notifyError(
-                    'Error: I did not manage to load the image. \n' +
-                    (error.message || ''));
-              });
+            .then((blob) => {
+              if (blob) {
+                // load the image
+                this.model.element.setImageUrl(element, blob.url);
+              }
+            })
+            .catch((error) => {
+              SilexNotification.notifyError(
+                'Error: I did not manage to load the image. \n' +
+                (error.message || ''));
+            });
           break;
       }
     }
@@ -338,32 +339,32 @@ export class EditMenuController extends ControllerBase {
       const componentData = this.model.property.getElementComponentData(element);
       if (element && this.model.component.prodotypeComponent && componentData) {
         this.model.component.prodotypeComponent.edit(
-            componentData,
-            this.model.property.getDataSources(),
-            componentData.templateName, {
-              onChange: (newData, html) => {
-                // undo checkpoint
-                this.undoCheckPoint();
+          componentData,
+          this.model.property.getDataSources(),
+          componentData.templateName, {
+            onChange: (newData, html) => {
+              // undo checkpoint
+              this.undoCheckPoint();
 
-                // remove the editable elements temporarily
-                const tempElements = this.model.component.saveEditableChildren(element);
+              // remove the editable elements temporarily
+              const tempElements = this.model.component.saveEditableChildren(element);
 
-                // store the component's data for later edition
-                this.model.property.setElementComponentData(element, newData);
+              // store the component's data for later edition
+              this.model.property.setElementComponentData(element, newData);
 
-                // update the element with the new template
-                this.model.element.setInnerHtml(element, html);
+              // update the element with the new template
+              this.model.element.setInnerHtml(element, html);
 
-                // execute the scripts
-                this.model.component.executeScripts(element);
+              // execute the scripts
+              this.model.component.executeScripts(element);
 
-                // put back the editable elements
-                element.appendChild(tempElements);
-              },
-              onBrowse: (e, url, cbk) => this.onBrowse(e, url, cbk),
-              onEditLink: (e, linkData, cbk) =>
-                  this.onEditLink(e, linkData, cbk),
-            });
+              // put back the editable elements
+              element.appendChild(tempElements);
+            },
+            onBrowse: (e, url, cbk) => this.onBrowse(e, url, cbk),
+            onEditLink: (e, linkData, cbk) =>
+              this.onEditLink(e, linkData, cbk),
+          });
       }
       this.model.component.componentEditorElement.classList.remove('hide-panel');
     } else {
@@ -392,25 +393,25 @@ export class EditMenuController extends ControllerBase {
 
     // handle the result
     promise
-    .then((fileInfo: FileInfo) => {
-      if (fileInfo) {
-        cbk([{
-          url: fileInfo.absPath,
-          modified: fileInfo.modified,
-          name: fileInfo.name,
-          size: fileInfo.size,
-          mime: fileInfo.mime,
-          path: '',
-          absPath: '',
-          folder: '',
-          service: '',
-          isDir: true,
-        }]);
-      }
-    })
-    .catch((error) => {
-      SilexNotification.notifyError('Error: I could not select the file. <br /><br />' + (error.message || ''));
-    });
+      .then((fileInfo: FileInfo) => {
+        if (fileInfo) {
+          cbk([{
+            url: fileInfo.absPath,
+            modified: fileInfo.modified,
+            name: fileInfo.name,
+            size: fileInfo.size,
+            mime: fileInfo.mime,
+            path: '',
+            absPath: '',
+            folder: '',
+            service: '',
+            isDir: true,
+          }]);
+        }
+      })
+      .catch((error) => {
+        SilexNotification.notifyError('Error: I could not select the file. <br /><br />' + (error.message || ''));
+      });
   }
 
   /**
@@ -428,16 +429,18 @@ export class EditMenuController extends ControllerBase {
     };
     this.model.component.prodotypeStyle.edit(
       pseudoClassData,
-      [{displayName: '', name: '', templateName: ''}]
-        .concat(this.model.property.getFonts()
-        .map((font) => {
-          return {
-            displayName: font.family,
-            name: font.family,
-            templateName: '',
-          };
-        }),
-      ),
+      {
+        components: [{displayName: '', name: '', templateName: ''}]
+          .concat(this.model.property.getFonts()
+            .map((font) => {
+              return {
+                displayName: font.family,
+                name: font.family,
+                templateName: 'font-family',
+              };
+            }),
+          ),
+      },
       'text', {
         onChange: (newData, html) => this.model.component.componentStyleChanged(className, pseudoClass, visibility, newData),
         onBrowse: (e, url, cbk) => this.onBrowse(e, url, cbk),
@@ -478,7 +481,7 @@ export class EditMenuController extends ControllerBase {
     // move all the elements in the selection
     elements.forEach((element) => {
       const stylesObj =
-          this.model.file.getContentWindow().getComputedStyle(element);
+        this.model.file.getContentWindow().getComputedStyle(element);
       const reverse = stylesObj.position !== 'absolute';
       if (reverse) {
         switch (direction) {
